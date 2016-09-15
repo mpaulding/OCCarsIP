@@ -6,96 +6,99 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
+
+import java.text.NumberFormat;
 
 public class PurchaseActivity extends Activity {
-    // THE AUTO OBJECT CONTAINS THE INFORMATION ABOUT THE VEHICLE BEING PURCHASED
-    Car mCar;
 
-    // THE DATA TO BE PASSED TO THE LOAN ACTIVITY
-    String loanReport;
-    String monthlyPayment;
+    private Car mCar;
 
-    // LAYOUT INPUT REFERENCES
-    private EditText carPriceET;
-    private EditText downPayET;
-    private RadioGroup loanTermRG;
+    private EditText carPriceEditText;
+    private EditText downPaymentEditText;
+    private RadioButton threeYearsRadioButton;
+    private RadioButton fourYearsRadioButton;
+    private RadioButton fiveYearsRadioButton;
+
+    private String monthlyPaymentText;
+    private String loanSummaryText;
+
+    private static NumberFormat currency = NumberFormat.getCurrencyInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_purchase);
 
-        //ESTABLISH REFERENCES TO EDITABLE TEXT FIELDS AND RADIO BUTTON
-        carPriceET = (EditText) findViewById(R.id.carPriceEditText);
-        downPayET = (EditText) findViewById(R.id.downPaymentEditText);
-        loanTermRG = (RadioGroup) findViewById(R.id.loanTermRadioGroup);
+        // Associate controller with views
+        carPriceEditText = (EditText) findViewById(R.id.carPriceEditText);
+        downPaymentEditText = (EditText) findViewById(R.id.downPaymentEditText);
 
-        //CREATE AN AUTOMOBILE OBJECT TO STORE AUTO DATA
+        threeYearsRadioButton = (RadioButton) findViewById(R.id.threeYearsRadioButton);
+        fourYearsRadioButton = (RadioButton) findViewById(R.id.fourYearsRadioButton);
+        fiveYearsRadioButton = (RadioButton) findViewById(R.id.fiveYearsRadioButton);
+
         mCar = new Car();
     }
 
-    private void collectAutoInputData() {
-        // TASK 1: SET THE CAR PRICE50
-        mCar.setPrice (Double.parseDouble(carPriceET.getText()
-                .toString()));
+    private void collectCarInputData()
+    {
+        double carPrice, downPayment;
 
-        //TASK 2: SET THE DOWN PAYMENT
-        mCar.setDownPayment((double)
-                Integer.valueOf(downPayET.getText()
-                        .toString()));
+        try {
+            carPrice = Double.parseDouble(carPriceEditText.getText().toString());
+            downPayment = Double.parseDouble(downPaymentEditText.getText().toString());
+        }
+        catch (NumberFormatException e)
+        {
+            carPrice = 0.0;
+            downPayment = 0.0;
+        }
 
-        //TASK 3 SET THE LOAN TERM
-        Integer radioId = loanTermRG.getCheckedRadioButtonId();
-        RadioButton term = (RadioButton) findViewById(radioId);
-        mCar.setLoanTerm(term.getText().toString());
-    }
-    private void buildLoanReport() {
-        // TASK 1: CONSTRUCT THE MONTHLY PAYMENT
-        monthlyPayment = getString(R.string.report_line1)
-                + String.format("%.02f", mCar.monthlyPayment());
+        int loanTerm;
 
+        if (fiveYearsRadioButton.isChecked())
+            loanTerm = 5;
+        else if (fourYearsRadioButton.isChecked())
+            loanTerm = 4;
+        else
+            loanTerm = 3;
 
-        // TASK 2: CONSTRUCT THE LOAN REPORT
-        loanReport = getString(R.string.report_line2)
-                + String.format("%10.02f", mCar.getPrice());
-        loanReport += getString(R.string.report_line3)
-                + String.format("%10.02f", mCar.getDownPayment());
-
-        loanReport += getString(R.string.report_line5)
-                + String.format("%18.02f", mCar.taxAmount());
-        loanReport += getString(R.string.report_line6)
-                + String.format("%18.02f", mCar.totalCost());
-        loanReport += getString(R.string.report_line7)
-                + String.format("%12.02f", mCar.borrowedAmount());
-        loanReport += getString(R.string.report_line8)
-                + String.format("%12.02f", mCar.interestAmount());
-
-        loanReport += "\n" + getString(R.string.report_line4) + " " + mCar.getLoanTerm() + " years.";
-
-        loanReport += "\n" + getString(R.string.report_line9);
-        loanReport += getString(R.string.report_line10);
-        loanReport += getString(R.string.report_line11);
-
+        mCar.setPrice(carPrice);
+        mCar.setDownPayment(downPayment);
+        mCar.setLoanTerm(loanTerm);
     }
 
-    public void activateLoanSummary(View view) {
-        //TASK 1: BUILD A LOAN REPORT FROM THE INPUT DATA
-        collectAutoInputData();
+    private void buildLoanReport()
+    {
+        monthlyPaymentText = getString(R.string.report_line1) + currency.format(mCar.monthlyPayment());
+
+        loanSummaryText = getString(R.string.report_line2) + currency.format(mCar.getPrice())
+                + getString(R.string.report_line3) + currency.format(mCar.getDownPayment())
+                + getString(R.string.report_line5) + currency.format(mCar.taxAmount())
+                + getString(R.string.report_line6) + currency.format(mCar.totalCost())
+                + getString(R.string.report_line7) + currency.format(mCar.borrowedAmount())
+                + getString(R.string.report_line8) + currency.format(mCar.interestAmount()) + "\n"
+                + getString(R.string.report_line4) + mCar.getLoanTerm() + " years.\n"
+                + getString(R.string.report_line9)
+                + getString(R.string.report_line10)
+                + getString(R.string.report_line11);
+    }
+
+    public void activateLoanSummary(View view)
+    {
+        collectCarInputData();
         buildLoanReport();
 
-        //TASK 2: CREATE AN INTENT TO DISPLAY THE LOAN SUMMARY ACTIVITY
-        Intent launchReport = new Intent(this, LoanSummaryActivity.class);
+        // Create Intent, put both Strings (monthlyPaymentText and loanReportText) in Intent
+        // then start LoanSummaryActivity
+        Intent loanSummaryIntent = new Intent(this, LoanSummaryActivity.class);
 
-        //TASK 3: PASS THE LOAN SUMMARY ACTIVITY TWO PIECES OF DATA:
-        //     THE LOAN REPORT CONTAINING LOAN DETAILS
-        //     THE MONTHLY PAYMENT
-        launchReport.putExtra("LoanReport", loanReport);
-        launchReport.putExtra("MonthlyPayment", monthlyPayment);
+        // Pass the loan summary activity as two pieces of data
+        loanSummaryIntent.putExtra("MonthlyPayment", monthlyPaymentText);
+        loanSummaryIntent.putExtra("LoanSummary", loanSummaryText);
 
-        //TASK 4: START THE LOAN ACTIVITY
-        startActivity(launchReport);
+        // Start the LoanSummaryActivity with the Intent data
+        startActivity(loanSummaryIntent);
     }
-
 
 }

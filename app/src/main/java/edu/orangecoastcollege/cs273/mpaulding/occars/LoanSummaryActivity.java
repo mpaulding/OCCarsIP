@@ -1,9 +1,8 @@
 package edu.orangecoastcollege.cs273.mpaulding.occars;
 
 import android.app.Activity;
-import android.os.Bundle;
-
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,20 +12,21 @@ public class LoanSummaryActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loan_summary);
-        TextView monthlyPayTextView = (TextView) findViewById(R.id.monthlyPaymentTextView);
-        TextView loanReportTextView = (TextView) findViewById(R.id.loanReportTextView);
 
-        // PASS DATA
-        Intent intent = getIntent();
+        TextView monthlyPaymentTextView = (TextView) findViewById(R.id.monthlyPaymentTextView);
+        TextView loanSummaryTextView = (TextView) findViewById(R.id.loanSummaryTextView);
 
-        String report = intent.getStringExtra("LoanReport");
-        String monthlyPay = intent.getStringExtra("MonthlyPayment");
+        Intent purchaseIntent = getIntent();
+        String monthlyPaymentText = purchaseIntent.getStringExtra("MonthlyPayment");
+        String loanSummaryText = purchaseIntent.getStringExtra("LoanSummary");
 
-        monthlyPayTextView.setText(monthlyPay);
-        loanReportTextView.setText(report);
+        monthlyPaymentTextView.setText(monthlyPaymentText);
+        loanSummaryTextView.setText(loanSummaryText);
     }
 
-    public void goDataEntry(View view) {
+    public void returnToDataEntry(View view)
+    {
         this.finish();
     }
+
 }

@@ -27,13 +27,8 @@ public class Car {
         return mDownPayment;
     }
 
-    public void setLoanTerm(String term) {
-        if (term.contains("3"))
-            mLoanTerm = 3;
-        else if (term.contains("4"))
-            mLoanTerm = 4;
-        else
-            mLoanTerm = 5;
+    public void setLoanTerm(int term) {
+        mLoanTerm = term;
     }
 
     public int getLoanTerm() {

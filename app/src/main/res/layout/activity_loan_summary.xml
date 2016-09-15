@@ -45,7 +45,7 @@
 
     <!-- TEXTVIEW HOLDING THE CAR LOAN SUMMARY -->
     <TextView
-        android:id="@+id/loanReportTextView"
+        android:id="@+id/loanSummaryTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView1"
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:onClick="goDataEntry"
+        android:onClick="returnToDataEntry"
         android:text="@string/go_data_entry" />
 
 </RelativeLayout>
